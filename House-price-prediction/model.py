@@ -5,9 +5,10 @@ import pandas as pd
 import joblib
 from  sklearn.model_selection import train_test_split 
 from sklearn.preprocessing import StandardScaler 
+import matplotlib.pyplot as plt
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
-torch.cuda.manual_seed(44)
+torch.cuda.manual_seed(42)
 torch.manual_seed(42)
 
 class House_price(nn.Module):
@@ -18,10 +19,13 @@ class House_price(nn.Module):
         self.layer =nn.Sequential(
             nn.Linear(input_feat,128),
             nn.ReLU(),
+            nn.Dropout(p=0.1),
             nn.Linear(128,256),
             nn.ReLU(),
+            nn.Dropout(p=0.1),
             nn.Linear(256,64),
             nn.ReLU(),
+            nn.Dropout(p=0.1),
             nn.Linear(64,1),
             
         )
@@ -85,21 +89,21 @@ if __name__ == "__main__" :
 
     model = House_price(16).to(device)
 
-    loss_fn = torch.nn.SmoothL1Loss()
-    optimizers = torch.optim.AdamW(params=model.parameters() ,lr=0.0001 , weight_decay=0.0001)
-
-    eval_loss_fn = torch.nn.L1Loss()
+    loss_fn = torch.nn.MSELoss()
+    optimizers = torch.optim.AdamW(params=model.parameters() ,lr=0.001 ,weight_decay=0.001 )
     
     model.train()
     best_loss = float('inf')
-    epochs = 1850
+    epochs = 75
 
+    loss_list =[]
+    val_loss_list = []
     for epoch in range(epochs):
         
         pred = model(Xtrain)
         
         loss =loss_fn(pred,ytrain)
-        
+        loss_list.append(loss.item())
         optimizers.zero_grad()
         
         loss.backward()
@@ -117,7 +121,8 @@ if __name__ == "__main__" :
             val_pred = model(Xval)
             
             val_loss =loss_fn(val_pred , yval)
-            MAE = eval_loss_fn(val_pred ,yval)
+            val_loss_list.append(val_loss.item())
+            
             # rmse = torch.sqrt(loss).item()
 
             
@@ -128,11 +133,15 @@ if __name__ == "__main__" :
             
             
         
-        if epoch % 50 == 0:
-            print(f" Epochs : {epoch}    loss : {loss}     val loss :{val_loss}     MAE : {MAE}")
+        if epoch % 10 == 0:
+            print(f" Epochs : {epoch}    loss : {loss}     val loss :{val_loss} ")
         
         if val_loss < best_loss:
             best_loss = val_loss
-            torch.save(model.state_dict(),"House-price-prediction/saved_models/trained_model_01.pth")
+            torch.save(model.state_dict(),"House-price-prediction/saved_models/trained_model_02.pth")
            
-        
+    plt.plot(loss_list, label ='Train loss')
+    plt.plot(val_loss_list ,label='Val loss')
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
+    plt.show()
