@@ -7,16 +7,44 @@ from  sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler ,PowerTransformer
 from sklearn.pipeline import Pipeline
 
-if __name__ == '__main__':
-    df = pd.read_csv('House-price-prediction/data/House Price India.csv')
-    df =df.drop(columns=['id','Date','Postal Code','Lattitude','Longitude','number of views','waterfront present','Renovation Year', 'living_area_renov', 'lot_area_renov'])
-    print(df.columns)
+# df = pd.read_csv('House-price-prediction/data/House Price India.csv')
+# df =df.drop(columns=['id','Date'])
+# print(df.columns)
 
+# print(df['Price'].describe())
+
+# percentile_25 =df['Price'].quantile(0.25)
+# percentile_75 =df['Price'].quantile(0.75)
+
+# IQR = percentile_75 -percentile_25
+
+# lower_limit = percentile_25 - 1.5 * IQR
+# upper_limit = percentile_75 + 1.5 * IQR
+
+# print(percentile_25)
+# print(percentile_75)
+# print(IQR)
+# print(upper_limit)
+# print(lower_limit)
+
+# new_df = df[ df['Price'] < upper_limit]
+# new_df = df[ df['Price'] > lower_limit]
+
+# print(new_df.count())
+
+# # Save the DataFrame to a CSV file
+# new_df.to_csv('House-price-prediction/data/cleaned_dataset.csv', index=False) # index=False prevents pandas from writing row indices as a column
+
+if __name__ == '__main__':
+    
+    # df = pd.read_csv('House-price-prediction/data/House Price India.csv')
+    # df =df.drop(columns=['id','Date'])
+    df = pd.read_csv('House-price-prediction/data/cleaned_dataset.csv')
     inputs=df.drop(columns=['Price'])
     print(inputs.shape)
     target =df['Price']
-    
-
+    print(df.count)
+    print(df.columns)
     
     
     
@@ -31,7 +59,7 @@ if __name__ == '__main__':
     ])
     
     Xtrain ,Xtest ,ytrain ,ytest = train_test_split(inputs,target,test_size=0.2,shuffle=True,random_state=42)
-    Xtrain ,Xval , ytrain ,yval =train_test_split(Xtrain ,ytrain ,test_size=0.2 ,random_state=42)
+    Xtrain ,Xval , ytrain ,yval =train_test_split(Xtrain ,ytrain ,test_size=0.2, shuffle=True ,random_state=42)
     
     print( Xtrain.shape  ,   Xval.shape   , Xtest.shape)
     
