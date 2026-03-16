@@ -18,15 +18,11 @@ class House_price(nn.Module):
         super().__init__()
         
         self.layer =nn.Sequential(
-            nn.Linear(input_feat,128),
+            nn.Linear(input_feat,64),
             nn.ReLU(),
             nn.Dropout(p=0.1),
-            nn.Linear(128,256),
+            nn.Linear(64,64),
             nn.ReLU(),
-            nn.Dropout(p=0.1),
-            nn.Linear(256,64),
-            nn.ReLU(),
-            nn.Dropout(p=0.1),
             nn.Linear(64,1),
             
         )
@@ -45,14 +41,14 @@ if __name__ == "__main__" :
 
 
 
-    model = House_price(12).to(device)
+    model = House_price(20).to(device)
 
     loss_fn = torch.nn.MSELoss()
-    optimizers = torch.optim.AdamW(params=model.parameters() ,lr=0.006 ,weight_decay=0.1 )
+    optimizers = torch.optim.AdamW(params=model.parameters() ,lr=0.001 ,weight_decay=0.00001 )
     
     model.train()
     best_loss = float('inf')
-    epochs = 50
+    epochs = 350
 
     loss_list =[]
     
